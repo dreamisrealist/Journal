@@ -11,7 +11,7 @@
 ========================= */
 
 (() => {
-  const IDLE_MINUTES = 5 / 60;                  // TESTING: 5 seconds. For real use change to 4 (minutes)
+  const IDLE_MINUTES = 2;                       // minutes without activity before the screensaver starts
   const SPEED = 170;                            // pixels per second
   const COLORS = ["#f4f4f4", "#e0562c", "#cbc9bb", "#7fb7a4", "#e6c35c", "#8f9bd9"];
 
@@ -85,7 +85,9 @@
     setTimeout(() => o.remove(), 650);
   }
 
+  let lastActive = Date.now();
   function arm() {
+    lastActive = Date.now();
     clearTimeout(timer);
     timer = setTimeout(start, IDLE_MS);
   }
@@ -107,6 +109,7 @@
     if (e.type === "scroll") {                                                     // only if the page really moved
       const moved = Math.abs(window.scrollY - sy) > 1; sy = window.scrollY; return moved;
     }
+    if (e.type === "keydown" && (e.ctrlKey || e.altKey || e.metaKey || ["Control", "Alt", "Meta", "Tab", "OS"].includes(e.key))) return false;
     return true;                                                                   // click, touch, key, wheel
   };
 
@@ -125,8 +128,12 @@
 
   window.addEventListener("resize", () => { if (overlay) measure(); });
 
-  // a hidden tab is not "looking at the site": restart the countdown when it comes back
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (overlay) stop(); arm(); } });
+  // Switching tabs or sites does not count as activity: the countdown keeps running while you are away, and the
+  // screensaver stays on when you come back until you move the mouse over the page. Browsers slow timers in
+  // background tabs, so on return check if the time is already up and start it right away.
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && !overlay && Date.now() - lastActive >= IDLE_MS) start();
+  });
 
   arm();
   console.info("[idle] loaded: screensaver after " + IDLE_MS / 1000 + "s without activity. Test now: idleScreensaver.start()");
