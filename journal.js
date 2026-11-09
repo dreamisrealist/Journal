@@ -442,7 +442,7 @@
     const card = document.createElement("div");
     card.className = "je-qnote";
     const clip = document.createElement("span"); clip.className = "je-qclip"; clip.setAttribute("aria-hidden", "true");
-    const mark = document.createElement("span"); mark.className = "je-qmark"; mark.setAttribute("aria-hidden", "true"); mark.textContent = "\u201C";
+    const mark = document.createElement("span"); mark.className = "je-qmark"; mark.setAttribute("aria-hidden", "true"); mark.innerHTML = '<svg viewBox="1 1 32 21" height="26" aria-hidden="true" focusable="false" style="display:block;height:26px;width:auto;fill:currentColor"><path d="M1.2 15.2C1.2 7.6 5.6 2.2 12.6 1.2L13.6 4.7C10.3 5.6 8.7 7.4 8.3 9.6 11.9 9.9 14 12.4 14 15.5 14 19 11.4 21.8 7.6 21.8 3.6 21.8 1.2 19 1.2 15.2Z"/><path d="M19.8 15.2C19.8 7.6 24.2 2.2 31.2 1.2L32.2 4.7C28.9 5.6 27.3 7.4 26.9 9.6 30.5 9.9 32.6 12.4 32.6 15.5 32.6 19 30 21.8 26.2 21.8 22.2 21.8 19.8 19 19.8 15.2Z"/></svg>';
     const ta = document.createElement("textarea");
     ta.className = "je-qtext"; ta.rows = 1; ta.maxLength = 140; ta.placeholder = "Write a quote…"; ta.setAttribute("aria-label", "Quote");
     ta.value = m.quote || ""; ta.readOnly = mode === "view";
