@@ -6,7 +6,7 @@
    for its class name and check the LAST match first.
 ========================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&display=swap');
+/* Inter Tight is loaded from index.html (<link>), which is faster than an @import here */
 
 /* Main font. "Obys NG" is just the name of the typeface: put your licensed font file at
    fonts/ObysNG.woff2 (or .otf). Until the file exists, the browser quietly uses the next font in the list. */
@@ -221,7 +221,7 @@ a {
 
 /* .hero is made as tall as the whole scroll (script.js), the stage stays pinned */
 .stage {
-  --u: clamp(7px, 1cqw, 40px);   /* base unit: 1% of the stage width (between 7px and 40px); most sizes are multiples of it */
+  --u: clamp(3px, min(1cqw, 1.78cqh), 40px);   /* base unit: 1% of the stage width (between 7px and 40px); most sizes are multiples of it */
   --pad: calc(var(--u) * 1.15);  /* measured side padding: 22px @1905 */
   position: sticky;
   top: 0;
@@ -780,55 +780,10 @@ body.ready .card-cream {
 
 /* =========================
    RESPONSIVE
+   (the phone layout is the block at the very END of this file, headed "PHONE LAYOUT". It switches on at
+   max-width: 768px and min-height: 480px. To make phones use the scaled PC layout again, change that
+   media query to (max-width: 0px).)
 ========================= */
-
-@media (max-width: 768px) {
-
-  .navbar {
-    padding: 20px;
-  }
-
-  .nav-links {
-    display: none;
-  }
-
-  .nav-menu {
-    top: 20px;
-    right: 20px;
-    font-size: 14px;
-  }
-
-  .stage { --u: 3cqw; }
-  .thumbs, .card-white, .card-orange { display: none; }
-  .card-grey { left: 5%; width: 90%; top: 14%; }
-  .card-grey .card-big { max-width: 100%; }
-  .card-side { display: none; }
-  .g-hero { height: 86cqh; }
-
-  /* scroll content, stacked for phones */
-  .feat { grid-template-columns: 1fr; grid-template-rows: none; margin-top: 0; }
-  .quotes { grid-row: auto; margin-top: 0; padding-top: calc(var(--u) * 4); }
-  .q-clip { display: none; }
-  .quotes blockquote { font-size: calc(var(--u) * 1.3); }
-  .sec-title { font-size: calc(var(--u) * 6.5); }
-  .book-list b, .about-lead, .houses-label { font-size: calc(var(--u) * 2.6); }
-  .book-list small, .about-cols, .author small { font-size: calc(var(--u) * 1.2); }
-  .book-list li { min-height: calc(var(--u) * 10); }
-  .author-grid { grid-template-columns: repeat(2, 1fr); }
-  .author .ini { font-size: calc(var(--u) * 6.5); }
-  .author b { font-size: calc(var(--u) * 2.2); }
-  .band { grid-template-columns: repeat(3, 1fr); height: calc(var(--u) * 20); grid-auto-rows: 1fr; margin-inline: 0; }
-  .band span { font-size: calc(var(--u) * 1.4); }
-  .about-cols { grid-template-columns: 1fr 1fr; }
-  .about-cols > p { grid-column: 1 / -1; }
-  .why { grid-column: 1 / -1; }
-  .numerals { font-size: calc(var(--u) * 6.5); }
-  .end-title { font-size: 8cqw; }
-  .card-cream { left: 62%; width: 32%; top: 66%; }
-  .contact-form { font-size: calc(var(--u) * 1.5); }
-  .clipped { left: -30%; }
-
-}
 
 @media (max-width: 420px) {
 
@@ -1127,7 +1082,7 @@ body.ready .card-cream {
 
 .card-white { padding-bottom: calc(var(--u) * 5); }
 .card-white .collection-cta { bottom: calc(var(--u) * .9); }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-height: 480px) {
   .collection-cta { font-size: 10px; padding: 7px 10px; }
 }
 
@@ -1198,9 +1153,7 @@ body.ready .card-cream {
   font: 800 7px/1 Arial, sans-serif;
   letter-spacing: .06em;
 }
-@media (max-width: 768px) {
-  .thumbs { display: none; }
-}
+
 
 
 /* =========================
@@ -1296,7 +1249,7 @@ body.overview-open .nav-menu { visibility: hidden; }
 .s-contacts > small { position: absolute; top: 8%; left: 6%; font-size: 1em; font-weight: 600; line-height: 1.1; text-decoration: underline; }
 .s-contacts > em { position: absolute; left: 0; bottom: 4%; font-size: 1.9em; font-weight: 800; letter-spacing: -0.05em; }
 
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-height: 480px) {
   .ov-cols { grid-template-columns: 1fr 1fr; gap: 24px 12px; top: 18%; }
 }
 
@@ -1519,8 +1472,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 /* open card = a wide card (≈1.66 : 1) that sits bottom-right, in front of everything */
 .stage .card-cream.open { left: 66.5%; width: 27%; height: calc(27cqw / 1.66); top: calc(100cqh - 27cqw / 1.66 - 5cqw); }
-@media (max-width: 768px) {
-  .stage .card-cream.open { left: 5%; width: 90%; height: calc(90cqw / 1.5); top: calc(100cqh - 90cqw / 1.5 - 8cqw); }
+@media (max-width: 768px) and (min-height: 480px) {
   .cc-back { font-size: calc(var(--u) * 1.9); }
   .cf-opt i, .cf-row i { width: calc(var(--u) * 1.7); height: calc(var(--u) * 1.7); }
 }
@@ -1566,7 +1518,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
   width: 1px; background: rgba(20,20,20,.7);
 }
 @keyframes bandScroll { to { transform: translateX(-50%); } }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-height: 480px) {
   .band { height: calc(var(--u) * 16); margin-inline: 0; }
   .band span { flex-basis: calc(var(--u) * 30); font-size: calc(var(--u) * 2.4); }
 }
@@ -1591,7 +1543,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 /* nature icons inside the band */
 .band span svg { display: block; width: calc(var(--u) * 3.8); height: auto; overflow: visible; }
-@media (max-width: 768px) { .band span svg { width: calc(var(--u) * 9); } }
+@media (max-width: 768px) and (min-height: 480px) { .band span svg { width: calc(var(--u) * 9); } }
 
 
 /* =========================
@@ -1722,7 +1674,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
   from { transform: translateX(calc(var(--u) * 3 - 33.3333%)); }
   to   { transform: translateX(calc(var(--u) * 3 - 66.6667%)); }
 }
-@media (max-width: 768px) {
+@media (max-width: 768px) and (min-height: 480px) {
   .band { --k: 2.2; height: calc(var(--u) * 16); margin-inline: calc(var(--u) * -1.5); }
   .band span { flex-basis: calc(var(--u) * 28); }
 }
@@ -2081,7 +2033,7 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
   --u: clamp(7px, 1cqw, 40px);
   --pad: calc(var(--u) * 1.15);
 }
-@media (max-width: 768px) { .ov-mini .mini-inner { --u: 3cqw; } }
+@media (max-width: 768px) and (min-height: 480px) { .ov-mini .mini-inner { --u: 3cqw; } }
 
 
 /* strip icons inside the live menu overview: let them react to the mouse (the rest of the copy stays inert) */
@@ -2143,3 +2095,115 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
 .je-solo { margin-top: 16px; }
 .je-solo:empty { display: none; }
 .je-qnote.solo { position: relative; right: auto; bottom: auto; width: min(100%, 440px); min-width: 0; margin-left: auto; margin-right: -20px; }   /* flush with the right edge of the paper (cancels the 20px side padding of the media section) */
+
+
+/* =========================================================
+   PHONE LAYOUT  (max-width: 768px, portrait)
+   Same four sheets, stacked like paper on a desk: the page you are on is in front, the other
+   sheets peek out behind it (orange strip above, white sheet at the left edge). A bar at the bottom
+   shows the current page; tap it to open the Menu with all four pages.
+   It is at the END of the file on purpose, so it wins over the desktop page arrangements above.
+   Change the media query to (max-width: 0px) to switch it off.
+========================================================= */
+@media (max-width: 768px) and (min-height: 480px) {
+
+  .stage { --u: 3cqw; --bar: 10.5cqh; }
+
+  .navbar { padding: 16px; }
+  .nav-links { display: none; }
+  .nav-menu { top: 16px; right: 16px; font-size: 14px; }
+
+  .card-side { display: none; }
+  .g-hero { height: 80cqh; }
+
+  /* ----- the stack: Journal (default) ----- */
+  .stage .card-grey   { left: 4%;  width: 92%; top: 20%;   z-index: 3; }
+  .stage .card-orange { left: 8%;  width: 88%; top: 14%;   z-index: 1; }
+  .stage .card-white  { left: 1%;  width: 90%; top: 27%;   z-index: 2; }
+  .stage .card-cream  { left: 62%; width: 32%; top: 78%;   z-index: 4; }
+  .card-grey .card-big { max-width: 100%; }
+
+  /* ----- Memories: the white sheet comes to the front ----- */
+  .stage[data-page="books"] .card-white  { left: 4%;  width: 92%; top: 20%; z-index: 3; }
+  .stage[data-page="books"] .card-grey   { left: 9%;  width: 88%; top: 14%; z-index: 2; }
+  .stage[data-page="books"] .card-orange { left: 12%; width: 84%; top: 10%; z-index: 1; }
+
+  /* ----- Entries: the orange strip comes to the front ----- */
+  .stage[data-page="credits"] .card-orange { left: 4%;  width: 92%; top: 20%; z-index: 5; }
+  .stage[data-page="credits"] .card-grey   { left: 9%;  width: 88%; top: 14%; z-index: 2; }
+  .stage[data-page="credits"] .card-white  { left: 1%;  width: 90%; top: 27%; z-index: 1; }
+
+  /* ----- Contact: the cream card opens up in front ----- */
+  .stage[data-page="contacts"] .card-cream  { left: 4%; width: 92%; top: 20%; height: calc(100cqh - 25cqh - var(--bar)); z-index: 6; }
+  .stage[data-page="contacts"] .card-grey   { left: 9%;  width: 88%; top: 14%; z-index: 2; }
+  .stage[data-page="contacts"] .card-orange { left: 12%; width: 84%; top: 10%; z-index: 1; }
+  .stage .card-cream.open { left: 5%; width: 90%; height: calc(90cqw / 1.5); top: calc(100cqh - 90cqw / 1.5 - var(--bar) - 4cqh); z-index: 7; }
+
+  /* ----- scroll content stacked for a narrow sheet ----- */
+  .feat { grid-template-columns: 1fr; grid-template-rows: none; margin-top: 0; }
+  .quotes { grid-row: auto; margin-top: 0; padding-top: calc(var(--u) * 4); }
+  .q-clip { display: none; }
+  .quotes blockquote { font-size: calc(var(--u) * 1.3); }
+  .sec-title { font-size: calc(var(--u) * 6.5); }
+  .book-list b, .about-lead, .houses-label { font-size: calc(var(--u) * 2.6); }
+  .book-list small, .about-cols, .author small { font-size: calc(var(--u) * 1.2); }
+  .book-list li { min-height: calc(var(--u) * 10); }
+  .author-grid { grid-template-columns: repeat(2, 1fr); }
+  .author .ini { font-size: calc(var(--u) * 6.5); }
+  .author b { font-size: calc(var(--u) * 2.2); }
+  .about-cols { grid-template-columns: 1fr 1fr; }
+  .about-cols > p { grid-column: 1 / -1; }
+  .why { grid-column: 1 / -1; }
+  .numerals { font-size: calc(var(--u) * 6.5); }
+  .end-title { font-size: 8cqw; }
+  .contact-form { font-size: calc(var(--u) * 1.5); }
+  .clipped { left: -30%; }
+
+  /* ----- bottom bar = the page thumbnails, collapsed to the current page ----- */
+  .thumbs {
+    left: 2.4%; right: 2.4%; top: auto; bottom: 1.8%; width: auto;
+    height: var(--bar);
+    display: block;
+    background: #212121;
+    z-index: 30;
+    box-shadow: 0 0 calc(var(--u) * 2) rgba(0, 0, 0, .55);
+    cursor: pointer;
+  }
+  .thumbs .thumb {
+    position: absolute;
+    left: 2.2cqh; top: 1.2cqh;
+    height: calc(var(--bar) - 2.4cqh);
+    width: calc((var(--bar) - 2.4cqh) * 1.1);
+    aspect-ratio: auto;
+  }
+  /* only the current page shows; the others stay in place (invisible) so their copies keep the right size */
+  .thumbs .thumb:not(.active) { opacity: 0; pointer-events: none; }
+  .thumbs .thumb::after { display: none; }                 /* no drag handle on a phone */
+  .thumbs .thumb .thumb-label {
+    display: block;
+    left: calc(100% + 4.2cqw); right: auto; top: 50%; bottom: auto;
+    width: max-content; padding: 0;
+    background: none; color: #fff;
+    font: 700 4.2cqw/1 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+    letter-spacing: -.02em; text-transform: none;
+    opacity: 1; transform: translateY(-50%);
+  }
+  .thumbs::after {                                         /* the "menu" lines on the right */
+    content: ""; position: absolute; right: 4.4cqw; top: 50%;
+    width: 4.6cqw; height: 3.2cqw; transform: translateY(-50%);
+    background:
+      linear-gradient(#f1f1ef, #f1f1ef) 0 0    / 100% 2px no-repeat,
+      linear-gradient(#f1f1ef, #f1f1ef) 0 50%  / 100% 2px no-repeat,
+      linear-gradient(#f1f1ef, #f1f1ef) 0 100% / 100% 2px no-repeat;
+    pointer-events: none;
+  }
+
+  /* the white and orange sheets were drawn for a wider sheet: give them their own text scale so they read well and keep their proportions
+     (--pad has to be set again here, it is computed from --u where it is declared) */
+  .stage .card-white, .ov-mini .card-white   { --u: 2.2cqw; --pad: calc(var(--u) * 1.15); }
+  .stage .card-orange, .ov-mini .card-orange { --u: 2.4cqw; --pad: calc(var(--u) * 1.15); }
+  .stage .card-cream.open { z-index: 31; }
+
+  /* the emblem keeps clear of the bar */
+  .emblem { bottom: calc(var(--bar) + 4cqh); }
+}

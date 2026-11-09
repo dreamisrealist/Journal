@@ -93,7 +93,11 @@ gsap.set(website, {
 });
 
 // The Dreams' Work Journal logo (three bars) in the top-left corner (~290px wide on desktop)
-const logoScale = Math.min(1.4, (window.innerWidth - 56) / 208);
+// phone portrait: as wide as the screen allows. Everything else (desktop, tablet, landscape, small windows):
+// proportional to the window, so the logo never swallows a small screen
+const logoScale = window.matchMedia("(max-width: 768px) and (min-height: 480px)").matches
+  ? Math.max(0.45, Math.min(1.4, (window.innerWidth - 56) / 208, (window.innerHeight * 0.105 - 18) / 80))   // phone: logo ends above the sheets
+  : Math.max(0.4, Math.min(1.4, window.innerWidth / 1371, window.innerHeight / 771));
 
 gsap.set(logo, {
   transformOrigin: "left top",
@@ -363,12 +367,13 @@ const END_GREY = 0.49;
 // the orange strip comes to rest with its bottom edge a little UNDER the small cream card (whose top rests at
 // END_GREY - 0.30 = 0.19 of the stage height), so there is no black gap between them
 const END_ORANGE = 0.20;
+const PHONE_SCROLL = window.matchMedia("(max-width: 768px) and (min-height: 480px)");
 const scrollLayers = [
   { el: greySheet,                              end: END_GREY },
   { el: document.querySelector(".card-white"),  end: END_GREY },
   { el: orangeSheet,                            end: END_ORANGE },
   { el: document.querySelector(".card-cream"),  end: END_GREY },
-  { el: document.querySelector(".thumbs"),      end: 0.47 }
+  { el: document.querySelector(".thumbs"),      end: 0.47, pin: true }
 ];
 
 let jeShift = 0;       // travel of the open entry's beige sheet
@@ -416,6 +421,7 @@ function updateScroll(force) {
   // sheets: individual `translate` property, so it stacks on top of GSAP's transform
   for (let i = 0; i < scrollLayers.length; i++) {
     const l = scrollLayers[i];
+    if (l.pin && PHONE_SCROLL.matches) { l.el.style.translate = ""; continue; }   // phone: the bottom bar stays put
     l.el.style.translate = "0 " + (-l.shift * p).toFixed(2) + "px";
   }
 
@@ -1175,6 +1181,13 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   }
 
   menu.addEventListener("click", e => { e.preventDefault(); show(true); });
+  // phone: the bar at the bottom is the page switcher. Tap it to see all four pages (capture phase: runs before the thumbnail's own click)
+  const PHONE_MQ = window.matchMedia("(max-width: 768px) and (min-height: 480px)");
+  const bar = document.querySelector(".thumbs");
+  if (bar) bar.addEventListener("click", e => {
+    if (!PHONE_MQ.matches) return;
+    e.preventDefault(); e.stopPropagation(); show(true);
+  }, true);
   closeBtn.addEventListener("click", () => show(false));
   cols.forEach(col => col.addEventListener("click", () => {
     show(false);
@@ -1199,10 +1212,13 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 (() => {
   const stageEl = document.querySelector("#stage");
   const SRC = { about: "card-grey", books: "card-white", credits: "card-orange", contacts: "card-cream" };
-  const FRAC = { about: 0.575, books: 0.40, credits: 0.486, contacts: 0.246 };   // sheet width / stage width
+  const FRAC_PC = { about: 0.575, books: 0.40, credits: 0.486, contacts: 0.246 };      // sheet width / stage width
+  const FRAC_PHONE = { about: 0.92, books: 0.92, credits: 0.92, contacts: 0.92 };      // on a phone every sheet is 92 percent wide
+  const PHONE = window.matchMedia("(max-width: 768px) and (min-height: 480px)");
   const source = p => [...stageEl.children].find(el => el.classList.contains(SRC[p]));
 
   function build() {
+    const FRAC = PHONE.matches ? FRAC_PHONE : FRAC_PC;
     const sw = stageEl.clientWidth;
     document.querySelectorAll(".thumb[data-page]").forEach(t => {
       const p = t.dataset.page, src = source(p), box = t.querySelector(".mini");
@@ -1290,7 +1306,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
   strip.querySelectorAll(".thumb").forEach(t => {
     t.addEventListener("pointerdown", e => {
-      if (e.button) return;   // the whole thumbnail drags (a plain click still opens the page)
+      if (e.button) return;
+      if (window.matchMedia("(max-width: 768px) and (min-height: 480px)").matches) return;      // phone: the bar is a button, not a drag list   // the whole thumbnail drags (a plain click still opens the page)
       gsap.killTweensOf(t, "y");
       drag = { t, off: e.clientY - t.getBoundingClientRect().top, y0: e.clientY, moved: false };
       if (t.setPointerCapture) t.setPointerCapture(e.pointerId);

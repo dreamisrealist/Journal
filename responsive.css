@@ -1,0 +1,117 @@
+/* =========================================================
+   RESPONSIVE LAYER  (Dreams' Work Journal)
+   Loads AFTER style.css. It does not replace the desktop design: it only fixes what goes wrong
+   on phones, tablets and unusual window sizes (address bar jumps, tiny text, zoom-on-tap,
+   editor squeezed, overlays cut off in landscape).
+   Delete this file + the <link> in index.html to get the previous behaviour back.
+========================================================= */
+
+/* ---------- everywhere ---------- */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;                 /* iOS / Android must not inflate text when the phone turns */
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;              /* no pull-to-refresh / bounce tearing the pinned stage */
+}
+body {
+  touch-action: manipulation;             /* no double-tap zoom delay on buttons and links */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+img, svg, canvas, video { max-width: 100%; }
+.card img, .je-item img { -webkit-user-drag: none; }
+
+/* the loader follows the visible screen, not the tallest possible one */
+.loader { height: 100vh; height: 100dvh; }
+.website { min-height: 100vh; min-height: 100svh; }
+
+/* keyboard users always see where they are */
+:where(a, button, [role="button"], input, textarea, select):focus-visible {
+  outline: 2px solid #e0562c;
+  outline-offset: 3px;
+}
+
+/* ---------- touch screens (no hover) ---------- */
+@media (hover: none) {
+  .hover-pic { display: none !important; }          /* the picture that follows the cursor has no cursor to follow */
+  .band:hover .band-track { animation-play-state: running; }
+  .nav-links a:hover::after { transform: scaleX(0); }
+  .nav-links a.active::after { transform: scaleX(1); }
+}
+
+/* bigger tap targets, and inputs at 16px so iOS does not zoom the page when you tap them */
+@media (pointer: coarse) {
+  .nav-menu, .ov-close, .je-close, .ol-skip { padding-block: 10px; }
+  .je-btn, .je-save, .je-del, .ol-go { min-height: 44px; }
+  .je-x { width: 36px; height: 36px; }
+  .je-text, .je-date, .je-author, input.je-tag, .je-count { font-size: 16px; }
+  .ol-field input { font-size: 22px; }
+}
+
+/* ---------- phones (portrait, same breakpoint as style.css) ---------- */
+/* entry editor / viewer on narrow screens */
+@media (max-width: 768px) {
+
+
+  .je-sheet { width: min(100vw - 16px, 720px); }
+  .je.edit .je-sheet { width: min(100vw - 16px, 1040px); min-height: max(93vh, 1000px); }
+  .je-hero { padding-inline: 16px; min-height: clamp(220px, 36vh, 360px); }
+  .je-body { grid-template-columns: minmax(0, 1fr); gap: 14px 0; padding: 14px 16px 20px; }
+  .je-c3 { text-align: left; }
+  .je-text { max-width: none; }
+  .je-media { padding: 0 16px 24px; min-height: 0; }
+  .je-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .je-foot { padding: 12px 16px; flex-wrap: wrap; row-gap: 10px; }
+  .je-item.big img, .je-item.photo canvas, .je-item.photo img.je-raw { max-height: 60vh; }
+  .je-qnote { min-width: 0; width: min(72%, 400px); }
+  .je-qnote.solo { width: 100%; margin-right: -16px; }
+}
+
+/* narrow desktop windows and tablets: the menu links would run into "Menu", so they sit just left of it */
+@media (min-width: 769px) and (max-width: 1100px), (max-width: 768px) and (max-height: 479px) {
+  .nav-links { left: auto; right: 100px; gap: 16px; }
+}
+
+
+
+/* menu links that scale down with the window (the PC menu has to fit 390px too) */
+@media (max-width: 900px) {
+  .navbar { padding: 16px 16px; }
+  .nav-links { left: auto; right: 15vw; top: 16px; gap: 2.2vw; }
+  .nav-menu { top: 16px; right: 16px; }
+  .nav-links a, .nav-menu { font-size: clamp(8px, 2.2vw, 16px); }
+}
+
+/* very small phones */
+@media (max-width: 380px) {
+  .je-top { font-size: 14px; }
+  .je-title { font-size: clamp(36px, 13vw, 56px); }
+}
+
+/* ---------- login sheet: never cut off, even with the keyboard open or in landscape ---------- */
+body .ol {
+  height: 100vh; height: 100dvh;
+  overflow-y: auto;
+  place-items: start center;
+  padding: 12px 0;
+  -webkit-overflow-scrolling: touch;
+}
+body .ol-sheet { margin-block: auto; }
+
+/* ---------- landscape phones and any short window ---------- */
+@media (max-height: 520px) {
+  .je-hero { min-height: 200px; }
+  .je-title { font-size: clamp(34px, 8vw, 64px); }
+  body .ol-hero h2 { font-size: clamp(34px, 9vh, 60px); }
+  body .ol-form { gap: 10px; padding-block: 12px; }
+}
+
+/* ---------- big screens (2K / 4K / ultrawide): keep readable sizes ---------- */
+@media (min-width: 2200px) {
+  .nav-links a, .nav-menu { font-size: clamp(14px, 0.92vw, 30px); }
+}
+
+/* ---------- people who ask for less motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .band-track { animation-duration: 120s; }
+}

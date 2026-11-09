@@ -15,7 +15,10 @@
 
   // which real sheet each overview column copies, and how wide that sheet is on the stage
   const SRC = { about: "card-grey", books: "card-white", credits: "card-orange", contacts: "card-cream" };
-  const FRAC = { about: 0.575, books: 0.40, credits: 0.486, contacts: 0.246 };   // sheet width / stage width
+  const FRAC_PC = { about: 0.575, books: 0.40, credits: 0.486, contacts: 0.246 };      // sheet width / stage width
+  const FRAC_PHONE = { about: 0.92, books: 0.92, credits: 0.92, contacts: 0.92 };      // phone layout: every sheet is 92 percent wide
+  const PHONE_LAYOUT = window.matchMedia("(max-width: 768px) and (min-height: 480px)");
+  let FRAC = FRAC_PC;
   const source = p => [...stageEl.children].find(el => el.classList.contains(SRC[p]));
   const isOpen = () => document.body.classList.contains("overview-open");
 
@@ -29,9 +32,10 @@
     return true;
   }
 
-  const phone = window.matchMedia("(max-width: 768px)");
+  const phone = window.matchMedia("(max-width: 0px)");
 
   function build() {
+    FRAC = PHONE_LAYOUT.matches ? FRAC_PHONE : FRAC_PC;
     // on phones the page is a different layout (the white and orange sheets are hidden), so a scaled copy
     // would not match: keep the simple static sheets there
     if (phone.matches) {
