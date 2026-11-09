@@ -62,7 +62,7 @@
 
   /* ---- cloud (Supabase) ---- */
   const cfg = window.JOURNAL_CLOUD || {};
-  const sb = (window.supabase && cfg.url && cfg.key && !/YOUR-/.test(cfg.url)) ? window.supabase.createClient(cfg.url, cfg.key) : null;
+  const sb = window.__sb || ((window.supabase && cfg.url && cfg.key && !/YOUR-/.test(cfg.url)) ? window.supabase.createClient(cfg.url, cfg.key) : null);
   const BUCKET = "media";
   let owner = false;                      // true only when the owner is logged in (the database enforces it too)
   const mediaURL = id => sb ? sb.storage.from(BUCKET).getPublicUrl(id).data.publicUrl : "";
@@ -157,29 +157,7 @@
       document.body.append(b);
     }
   }
-  function showLogin() {
-    if (document.querySelector(".je-login")) return;
-    const w = document.createElement("div");
-    w.className = "je-login";
-    w.style.cssText = "position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:rgba(0,0,0,.45)";
-    w.innerHTML = '<form style="background:#f3efe4;color:#111;padding:24px;display:grid;gap:10px;width:min(320px,90vw);font:inherit">' +
-      '<b>Owner login</b>' +
-      '<input type="email" name="email" placeholder="Email" autocomplete="username" required style="padding:8px;font:inherit">' +
-      '<input type="password" name="pw" placeholder="Password" autocomplete="current-password" required style="padding:8px;font:inherit">' +
-      '<button type="submit" style="padding:8px;font:inherit;cursor:pointer">Log in</button>' +
-      '<small class="msg"></small>' +
-      '<button type="button" class="x" style="padding:6px;font:inherit;cursor:pointer;background:none;border:0">Cancel</button></form>';
-    document.body.append(w);
-    const f = w.querySelector("form"), msg = w.querySelector(".msg");
-    w.querySelector(".x").addEventListener("click", () => w.remove());
-    f.addEventListener("submit", async e => {
-      e.preventDefault(); msg.textContent = "Logging in…";
-      const r = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.pw.value });
-      if (r.error) { msg.textContent = r.error.message; return; }
-      location.replace(location.pathname);       // reload without ?owner
-    });
-    f.email.focus();
-  }
+  const showLogin = () => { if (window.ownerLogin) window.ownerLogin.show(false); };   // the themed box lives in login.js
   const labelOf = en => (en.label || "").trim() || "Entry";
 
 
@@ -728,11 +706,12 @@
   render();
   (async () => {
     try {
+      if (window.__authGate) await window.__authGate;     // login box is open: wait until you are in
       await initAuth();
       await loadCloud();
       if (owner) await migrateLocal();
       render();                                         // strips now know whether you are the owner
-      if (sb && !owner && new URLSearchParams(location.search).has("owner")) showLogin();
+      if (sb && !owner && !window.__authGate && new URLSearchParams(location.search).has("owner")) showLogin();   // only when the box was not already shown first
     } catch (e) { console.warn(e); }
   })();
 })();

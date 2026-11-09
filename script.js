@@ -287,6 +287,12 @@ const FAST_SPEED = 1.4;    // once everything is rendered / loaded
 const loaderTimeline = startLoader();
 loaderTimeline.timeScale(SLOW_SPEED);
 
+// owner login (login.js) is open: keep the intro on hold until the person logs in
+if (window.__holdIntro) {
+  loaderTimeline.pause();
+  window.__resumeIntro = () => loaderTimeline.play();
+}
+
 const pageLoaded = new Promise(resolve => {
   if (document.readyState === "complete") {
     resolve();
