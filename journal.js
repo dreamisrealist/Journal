@@ -66,7 +66,7 @@
   const BUCKET = "media";
   let owner = false;                      // true only when the owner is logged in (the database enforces it too)
   const mediaURL = id => sb ? sb.storage.from(BUCKET).getPublicUrl(id).data.publicUrl : "";
-  const fail = err => { console.error(err); try { stateEl.textContent = "Not saved ✗ (are you logged in?)"; } catch (e) {} };
+  const fail = err => { console.error(err); try { stateEl.textContent = "Not saved ✗ " + String((err && err.message) || "").slice(0, 70); } catch (e) {} };
 
   const fix = e => {                       // tidy an entry (older ones had a Journal / Memory switch)
     if (typeof e.label !== "string") { e.label = e.kind === "memory" ? "Memory" : "Journal"; delete e.kind; }
@@ -113,7 +113,7 @@
   const putBlob = async (id, blob) => {
     blobs.set(id, blob);
     if (!owner || !sb) return;
-    const r = await sb.storage.from(BUCKET).upload(id, blob, { upsert: true, contentType: blob.type });
+    const r = await sb.storage.from(BUCKET).upload(id, blob, { upsert: false, contentType: blob.type });
     if (r.error) fail(r.error);
   };
   const delBlob = id => { blobs.delete(id); if (owner && sb) sb.storage.from(BUCKET).remove([id]); };
