@@ -2121,6 +2121,7 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
   .stage .card-orange { left: 8%;  width: 88%; top: 14%;   z-index: 1; }
   .stage .card-white  { left: 1%;  width: 90%; top: 27%;   z-index: 2; }
   .stage .card-cream  { left: 62%; width: 32%; top: 78%;   z-index: 4; }
+  .stage:not([data-page="contacts"]) > .card-cream { display: none; }   /* the small contact card only shows on the Contact page (the bar / Menu get you there) */
   .card-grey .card-big { max-width: 100%; }
 
   /* ----- Memories: the white sheet comes to the front ----- */
@@ -2177,7 +2178,7 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
     aspect-ratio: auto;
   }
   /* only the current page shows; the others stay in place (invisible) so their copies keep the right size */
-  .thumbs .thumb:not(.active) { opacity: 0; pointer-events: none; }
+  .thumbs .thumb:not(.active) { opacity: 0 !important; visibility: hidden !important; pointer-events: none; }   /* !important: the intro animation sets an inline opacity on every thumbnail */
   .thumbs .thumb::after { display: none; }                 /* no drag handle on a phone */
   .thumbs .thumb .thumb-label {
     display: block;
