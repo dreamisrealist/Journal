@@ -149,12 +149,24 @@
     if (!sb) return;
     const s = await sb.auth.getSession();
     owner = !!(s.data && s.data.session);
-    if (owner) {
-      const b = document.createElement("button");
-      b.type = "button"; b.textContent = "Owner · Log out";
-      b.style.cssText = "position:fixed;right:12px;bottom:12px;z-index:99998;padding:6px 10px;font:12px/1 inherit;cursor:pointer;opacity:.7";
-      b.addEventListener("click", () => sb.auth.signOut().then(() => location.reload()));
-      document.body.append(b);
+    if (owner) {                                       // "Owner · Log out" lives in the Menu overview, top left
+      const ov = document.querySelector("#overview");
+      if (ov && !ov.querySelector(".ov-owner")) {
+        const st = document.createElement("style");
+        st.textContent =
+          ".ov-owner { position: absolute; top: 24px; left: 28px; display: inline-flex; align-items: center; gap: 8px; padding: 0; background: none; border: 0; color: inherit; cursor: pointer; font-family: inherit; font-weight: 700; font-size: clamp(14px, 0.92vw, 22px); line-height: 1; letter-spacing: -0.02em; outline: none; }" +
+          ".ov-owner i { font-style: normal; font-weight: 600; font-size: .8em; line-height: 1; padding: .25em .6em; border: 1px solid currentColor; border-radius: 99px; }" +
+          ".ov-owner span { position: relative; }" +
+          ".ov-owner span::after { content: ''; position: absolute; left: 0; right: 0; bottom: -3px; height: 2px; background: currentColor; transform: scaleX(0); transform-origin: right center; transition: transform .3s ease; }" +
+          ".ov-owner:hover span::after, .ov-owner:focus-visible span::after { transform: scaleX(1); transform-origin: left center; }" +
+          ".ov-owner:hover i, .ov-owner:focus-visible i { background: #e0562c; border-color: #e0562c; color: #fff; }";
+        document.head.append(st);
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "ov-owner";
+        b.innerHTML = "<i>Owner</i><span>Log out</span>";
+        b.addEventListener("click", () => sb.auth.signOut().then(() => location.reload()));
+        ov.append(b);
+      }
     }
   }
   const showLogin = () => { if (window.ownerLogin) window.ownerLogin.show(false); };   // the themed box lives in login.js
