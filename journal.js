@@ -476,7 +476,8 @@
     const list = await Promise.all(en.media.map(async m => ({ m, blob: m.type === "video" ? null : await getBlob(m.id) })));
     if (cur !== en) return;
     grid.textContent = ""; showCount();
-    soloEl.textContent = ""; soloEl.append(quoteNote(en, true));      // the entry's own quote note: always there, photo or not
+    soloEl.textContent = "";
+    let notePlaced = false;      // the entry's ONE quote note: lies over the first photo (photo goes behind it); with no photo it sits on its own
     list.forEach(({ m, blob }) => {
       const fig = document.createElement("figure");
       fig.className = "je-item";
@@ -495,7 +496,8 @@
           const im = new Image();
           im.onload = () => { try { drawHalftone(im, cv); } catch (e) { fig.classList.add("raw"); im.className = "je-raw"; fig.prepend(im); cv.remove(); } };
           im.src = url;
-          fig.append(quoteNote(m));
+          if (!notePlaced) { fig.append(quoteNote(en)); notePlaced = true; }
+          else if ((m.quote || "").trim()) fig.append(quoteNote(m));   // other photos only keep an old quote if they already had one
         }
       } else {
         const miss = document.createElement("span");
@@ -511,6 +513,7 @@
       if (mode === "edit") fig.append(x);
       grid.append(fig);
     });
+    if (!notePlaced) soloEl.append(quoteNote(en, true));      // no photo yet: the note sits on its own
   }
 
   // photos are resized to at most 1600px and re-saved as JPEG before upload (saves most of the free storage)

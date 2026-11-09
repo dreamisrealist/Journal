@@ -11,7 +11,7 @@
 ========================= */
 
 (() => {
-  const IDLE_MINUTES = 2;                       // minutes without activity before the screensaver starts
+  const IDLE_MINUTES = 5;                       // minutes without activity before the screensaver starts
   const SPEED = 170;                            // pixels per second
   const COLORS = ["#f4f4f4", "#e0562c", "#cbc9bb", "#7fb7a4", "#e6c35c", "#8f9bd9"];
 
