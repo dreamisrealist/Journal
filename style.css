@@ -1960,7 +1960,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 }
 .je-c3 { text-align: right; white-space: nowrap; }
 
-.je-media { padding: 0 20px 28px; }
+.je-media { padding: 0 20px 28px; min-height: 360px; }
 .je-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; font-size: 14px; font-weight: 700; }
 .je-btn { display: inline-block; background: none; color: #262626; font: inherit; cursor: pointer; border: 1px solid #262626; padding: 6px 12px; }
 .je-btn:hover { background: #262626; color: #e6e4d8; }
@@ -1980,7 +1980,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 /* Save sits at the bottom of the paper and stays visible while you scroll */
 .je-foot {
-  position: sticky; bottom: 0; z-index: 2;
+  position: relative; z-index: 2;   /* not sticky: the sheet is moved by a transform, so sticky drew the bar on top of the Add photos row */
   display: flex; align-items: center; gap: 12px;
   padding: 14px 20px; border-top: 1px solid #262626;
   background: #c8c6b8 var(--img-beige) bottom center / 100% auto;
@@ -2053,7 +2053,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 .o-blocks i[data-act]:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
 
 /* writing from the Entries page: the sheet is centred (nothing behind it to peek out) */
-.je.edit .je-sheet { top: 7vh; left: 0; right: 0; margin-inline: auto; width: min(1040px, 94vw); }
+.je.edit .je-sheet { top: 7vh; left: 0; right: 0; margin-inline: auto; width: min(1040px, 94vw); min-height: max(93vh, 1150px); }   /* long enough that title, text, Add photos/clips, quote note and Save never overlap */
 
 /* the label is now a text field, not a switch */
 input.je-tag { outline: 0; cursor: text; min-width: 6ch; max-width: 60%; }
@@ -2141,4 +2141,4 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
 /* the entry's own quote note (works with no photo at all): sits in the flow instead of over a picture */
 .je-solo { margin-top: 16px; }
 .je-solo:empty { display: none; }
-.je-qnote.solo { position: relative; right: auto; bottom: auto; width: min(100%, 340px); min-width: 0; }
+.je-qnote.solo { position: relative; right: auto; bottom: auto; width: min(100%, 340px); min-width: 0; margin-left: auto; margin-right: 8px; }
