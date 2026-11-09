@@ -425,7 +425,10 @@ function updateScroll(force) {
   if (v !== lastV || v > 0) {
     lastV = v;
     footBars.style.setProperty("--v", v.toFixed(3));
-    emblem.style.translate = "0 " + (-v * 0.13 * stageH).toFixed(1) + "px";
+    // lift the emblem so it rests a clear gap above the footer bar logo (gap measured on the reference, ~2.3 units),
+    // whatever the window size: bars top = 5.5% of the stage + 4.6 units, emblem bottom starts 1.1 units from the bottom
+    const fu = footBars.offsetHeight / 4.6;
+    emblem.style.translate = "0 " + (-v * (0.055 * stageH + 5.9 * fu)).toFixed(1) + "px";
   }
   setFootSpread(p > 0.985 ? 1 : 0);
 }
@@ -454,6 +457,20 @@ window.addEventListener("resize", layoutScroll);
 layoutScroll();
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutScroll);
 window.addEventListener("load", layoutScroll);
+
+// the rest positions are measured from the sheets' sizes, so measure again whenever any of them changes
+// (images, entries, fonts or the journal list finishing later); otherwise the sheets stop at different heights
+(() => {
+  let raf = 0;
+  const again = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(layoutScroll); };
+  if (typeof ResizeObserver !== "undefined") {
+    const ro = new ResizeObserver(again);
+    const opt = { box: "border-box" };
+    ro.observe(stage, opt);
+    scrollLayers.forEach(l => l.el && ro.observe(l.el, opt));
+  }
+  document.addEventListener("load", e => { if (e.target && e.target.tagName === "IMG") again(); }, true);
+})();
 
 
 /* nav / in-page links -> positions inside the long sheet */

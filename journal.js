@@ -410,6 +410,20 @@
     actx.drawImage(img, 0, 0, w, h);
     const px = actx.getImageData(0, 0, w, h).data;
     cv.width = w; cv.height = h;
+
+    // auto exposure: stretch the photo's own darkest..lightest tones to the full range, then lift or lower the
+    // middle so a typical tone lands mid-way. Dark photos stop turning into one solid black block.
+    const hist = new Uint32Array(256);
+    let total = 0;
+    for (let i = 0; i < px.length; i += 16) { hist[(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) | 0]++; total++; }
+    const at = f => { let s = 0; for (let v = 0; v < 256; v++) { s += hist[v]; if (s >= total * f) return v; } return 255; };
+    let lo = at(0.02), hi = at(0.98);
+    if (hi - lo < 40) { lo = 0; hi = 255; }
+    const stretch = v => Math.min(1, Math.max(0, (v - lo) / (hi - lo)));
+    const med = stretch(at(0.5));
+    const gamma = med > 0.02 && med < 0.98 ? Math.min(1.5, Math.max(0.4, Math.log(0.55) / Math.log(med))) : 1;
+    const lut = new Float32Array(256);
+    for (let v = 0; v < 256; v++) lut[v] = Math.pow(stretch(v), gamma);
     const ctx = cv.getContext("2d");
     ctx.fillStyle = "#c9c8bc"; ctx.fillRect(0, 0, w, h);
     ctx.fillStyle = "#3b3b39"; ctx.beginPath();
@@ -424,11 +438,11 @@
         for (const [dx, dy] of S) {
           const x = Math.min(w - 1, Math.max(0, Math.round(cx + dx))), y = Math.min(h - 1, Math.max(0, Math.round(cy + dy)));
           const i = (y * w + x) * 4;
-          lum += (0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) / 255;
+          lum += lut[(0.299 * px[i] + 0.587 * px[i + 1] + 0.114 * px[i + 2]) | 0];
         }
-        const cov = Math.min(1, Math.max(0, (1 - lum / S.length - 0.06) * 1.3));
-        if (cov < 0.05) continue;
-        const r = P * Math.sqrt(cov) * 0.74;
+        const cov = Math.min(1, Math.max(0, (1 - lum / S.length - 0.05) * 1.15));
+        if (cov < 0.04) continue;
+        const r = P * Math.sqrt(cov) * 0.55;               // dot area follows the tone: mid-tones stay separate dots
         const ux = cos * r, uy = sin * r, vx = -sin * r, vy = cos * r;
         ctx.moveTo(cx - ux - vx, cy - uy - vy); ctx.lineTo(cx + ux - vx, cy + uy - vy);
         ctx.lineTo(cx + ux + vx, cy + uy + vy); ctx.lineTo(cx - ux + vx, cy - uy + vy); ctx.closePath();
@@ -497,14 +511,34 @@
     });
   }
 
+  // photos are resized to at most 1600px and re-saved as JPEG before upload (saves most of the free storage)
+  async function shrink(file) {
+    try {
+      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+      const MAX = 1600;
+      let bmp;
+      try { bmp = await createImageBitmap(file, { imageOrientation: "from-image" }); } catch (e) { bmp = await createImageBitmap(file); }
+      const k = Math.min(1, MAX / Math.max(bmp.width, bmp.height));
+      if (k === 1 && file.size < 700 * 1024) { if (bmp.close) bmp.close(); return file; }
+      const cv = document.createElement("canvas");
+      cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      const c = cv.getContext("2d"); c.fillStyle = "#fff"; c.fillRect(0, 0, cv.width, cv.height);
+      c.drawImage(bmp, 0, 0, cv.width, cv.height);
+      if (bmp.close) bmp.close();
+      const out = await new Promise(res => cv.toBlob(res, "image/jpeg", 0.85));
+      return out && out.size < file.size ? out : file;
+    } catch (e) { return file; }
+  }
+
   async function addFiles(files, type) {
     if (!cur) return;
     const en = cur;
     stateEl.textContent = "Adding…";
     for (const f of files) {
       if (!f.type.startsWith(type + "/")) continue;
+      if (f.size > 50 * 1024 * 1024) { note.textContent = f.name + " is over 50 MB (the free limit), so it was skipped."; continue; }
       const id = uid("m");
-      await putBlob(id, f);
+      await putBlob(id, type === "image" ? await shrink(f) : f);
       en.media.push({ id, type, name: f.name });
     }
     persist(en);

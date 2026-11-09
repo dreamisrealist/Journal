@@ -90,16 +90,33 @@
     timer = setTimeout(start, IDLE_MS);
   }
 
-  // any activity: if the screensaver is showing, bring the site back; always restart the countdown
+  // Browsers fire "fake" mousemove events (same position) whenever something animates under a still cursor, and the
+  // page has animation running all the time. Those must NOT count as activity, so only real movement does.
+  const debug = new URLSearchParams(location.search).has("idledebug");
+  let px = null, py = null, sy = window.scrollY;
+  const seen = why => { window.__idleLast = why + " @ " + new Date().toLocaleTimeString(); if (debug) console.log("[idle] activity:", why); };
+
+  const isReal = e => {
+    if (e.type === "mousemove" || e.type === "pointermove") {
+      if (px === null) { px = e.clientX; py = e.clientY; return false; }           // first one only gives a starting point
+      const d = Math.abs(e.clientX - px) + Math.abs(e.clientY - py);
+      if (d < 4) return false;                                                     // same spot / tiny tremor: not activity
+      px = e.clientX; py = e.clientY;
+      return true;
+    }
+    if (e.type === "scroll") {                                                     // only if the page really moved
+      const moved = Math.abs(window.scrollY - sy) > 1; sy = window.scrollY; return moved;
+    }
+    return true;                                                                   // click, touch, key, wheel
+  };
+
   function activity(e) {
+    if (!isReal(e)) return;
     if (overlay) {
-      if (performance.now() - shownAt < 400) return;                       // ignore the jitter right as it appears
-      if (e && e.type === "mousemove") {                                    // tiny mouse tremors do not count
-        if (lastMX < 0) { lastMX = e.clientX; lastMY = e.clientY; return; }
-        if (Math.abs(e.clientX - lastMX) + Math.abs(e.clientY - lastMY) < 6) return;
-      }
+      if (performance.now() - shownAt < 400) return;                               // ignore the jitter right as it appears
       stop();
     }
+    seen(e.type);
     arm();
   }
 
@@ -112,4 +129,5 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (overlay) stop(); arm(); } });
 
   arm();
+  if (debug) console.log("[idle] ready, screensaver after", IDLE_MS / 1000, "seconds without activity");
 })();
