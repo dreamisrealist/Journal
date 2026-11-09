@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 138" width="352" height="138">
+  <title>Three staggered horizontal bars</title>
+  <rect width="352" height="138" fill="#0b0b0b"/>
+  <g fill="#eeeeee">
+    <rect x="78" y="13" width="182" height="31"/>
+    <rect x="24" y="54" width="182" height="31"/>
+    <rect x="89" y="94" width="226" height="31"/>
+  </g>
+</svg>
