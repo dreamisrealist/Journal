@@ -1,5 +1,12 @@
 
 /* =========================
+   DREAMS' WORK JOURNAL: MAIN SCRIPT
+   The intro animation, smooth scrolling, the stack of paper sheets, page changes, the Menu overview,
+   drawing mode, hover pictures and the halftone effects.
+   Entries are handled in journal.js, the owner login in login.js, the Entries credit strip in credit.js.
+========================= */
+
+/* =========================
    SELECT ELEMENTS
 ========================= */
 
@@ -85,7 +92,7 @@ gsap.set(website, {
   autoAlpha: 0
 });
 
-// New logo in the top-left corner (~290px wide on desktop)
+// The Dreams' Work Journal logo (three bars) in the top-left corner (~290px wide on desktop)
 const logoScale = Math.min(1.4, (window.innerWidth - 56) / 208);
 
 gsap.set(logo, {
@@ -340,7 +347,7 @@ function initParallax() {
 /* =========================
    SCROLL: THE PAPER STACK
    The stage stays pinned. Every sheet slides up at its own speed and they
-   all come to rest together (like the reference). The grey sheet moves 1:1
+   all come to rest together. The grey sheet moves 1:1
    with the scroll; the others are interpolated so they finish at the same time.
 ========================= */
 
@@ -425,7 +432,7 @@ function updateScroll(force) {
   if (v !== lastV || v > 0) {
     lastV = v;
     footBars.style.setProperty("--v", v.toFixed(3));
-    // lift the emblem so it rests a clear gap above the footer bar logo (gap measured on the reference, ~2.3 units),
+    // lift the emblem so it rests a clear gap above the footer bar logo (about 2.3 units),
     // whatever the window size: bars top = 5.5% of the stage + 4.6 units, emblem bottom starts 1.1 units from the bottom
     const fu = footBars.offsetHeight / 4.6;
     emblem.style.translate = "0 " + (-v * (0.055 * stageH + 5.9 * fu)).toFixed(1) + "px";
@@ -641,8 +648,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 
 /* =========================
-   HOVER BOOK IMAGE
-   A 3D object follows the cursor over the numbered lists (item n -> book n).
+   HOVER PICTURE
+   A picture follows the cursor over the numbered entry lists (row n -> picture n).
 ========================= */
 
 (() => {
@@ -686,7 +693,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     return v == null || v === "" ? null : urlOf(v);
   };
 
-  /* Halftone look from the reference: black diamond dots on a 45deg screen,
+  /* Halftone look: black diamond dots on a 45deg screen,
      transparent between them. Built once per image on a canvas.
      If the browser blocks reading pixels (page opened as file://), the
      original image is used instead - run a local server to get the effect. */
@@ -767,7 +774,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     .forEach(v => { if (v != null && v !== "") load(urlOf(v)); });
 
   gsap.set(pic, { xPercent: -50, yPercent: -50 });
-  // slow, floaty follow like the reference (the picture trails the cursor)
+  // slow, floaty follow: the picture trails behind the cursor
   const qx = gsap.quickTo(pic, "x", { duration: 0.8, ease: "power3.out" });
   const qy = gsap.quickTo(pic, "y", { duration: 0.8, ease: "power3.out" });
 
@@ -821,8 +828,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   if (!img) return;
 
   const W = 820;              // backing width (displayed ~410px wide, so 2x sharp)
-  const P = 16;               // dot pitch in backing px  -> bigger = coarser (the reference has big, clearly separate dots)
-  const INK = "#333333";      // dark grey, not black, like the reference
+  const P = 16;               // dot pitch in backing px  -> bigger = coarser (big, clearly separate dots look best)
+  const INK = "#333333";      // dark grey, not black, so the flower stays soft
   const ANG = Math.PI / 4;
   const cos = Math.cos(ANG), sin = Math.sin(ANG);
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -956,10 +963,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 
 /* =========================
-   PAGES (same webpage, sheets drop away and the next page rises in)
-   About / Books / Credits / Contacts are different arrangements of the same
-   four sheets. Switching: every sheet drops down at an angle, the layout
-   changes while they are off-screen, then they swing back up and settle.
+   PAGES (same webpage: the sheets drop away and the next page rises in)
+   Journal, Memories, Entries and Contact are different arrangements of the same
+   four sheets. In the code they are called about, books, credits and contacts.
+   Switching: every sheet drops down at an angle, the layout changes while they
+   are off-screen, then they swing back up and settle.
 ========================= */
 
 (() => {
@@ -996,7 +1004,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 
   /* ---- page-change motion ------------------------------------------------
-     Tuned from a frame-by-frame (60fps) read of the reference recording.
+     Timing was tuned by hand, frame by frame (60fps), until the page change felt right.
 
      DROP  The grey sheet leaves first and the others start ~0.1s later, but
            the later ones fall faster, so the whole stack clears together
@@ -1009,7 +1017,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
            soft landing. The tilt unwinds more slowly than the rise.
            Sheets start just below the bottom edge: no invisible dead travel.
 
-     WEIGHT stretches every duration. 1 = the reference exactly, higher = heavier.
+     WEIGHT stretches every duration. 1 = the normal feel, higher = heavier.
      The per-sheet numbers are seconds at WEIGHT 1; tilts are degrees. */
 
   gsap.config({ force3D: true });     // stay on the GPU the whole time: no snap when a tween ends
@@ -1024,7 +1032,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
     dropR: p => Math.pow(p, 1.8),
     riseY: p => 1 - Math.pow(1 - p, 3.4),
     riseR: p => 1 - Math.pow(1 - p, 2.2),
-    // cascade + tilt, matching the original site's recording
+    // cascade + tilt (see the DROP / RISE notes above)
     sheets: [
       { sel: ".card-grey",   dropAt: 0,    dropTilt: -2.5, riseAt: 0,    riseTilt: -3.5 },
       { sel: ".card-orange", dropAt: 0.05, dropTilt:  3.5, riseAt: 0.10, riseTilt:  3   },
@@ -1155,8 +1163,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
       window.scrollTo(0, 0);
       gsap.fromTo(ov, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4, ease: "power2.out", overwrite: true });
       gsap.fromTo(cols, { y: 90, rotation: i => TILTS(i) }, { y: 0, rotation: 0, duration: 0.9, stagger: 0.07, ease: "power3.out", overwrite: true });
+      gsap.killTweensOf(closeBtn); gsap.set(closeBtn, { autoAlpha: 1 });
       closeBtn.focus({ preventScroll: true });
     } else {
+      // the real "Menu" link comes back in the same corner at once; hide "Close" first so the two never overlap (the nav blends with difference, which made the glitch)
+      gsap.killTweensOf(closeBtn); gsap.set(closeBtn, { autoAlpha: 0 });
       gsap.to(ov, { autoAlpha: 0, duration: 0.35, ease: "power2.in", overwrite: true });
       if (lenis) lenis.start();
       menu.focus({ preventScroll: true });
@@ -1330,7 +1341,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 
 /* =========================
-   BOOKS PAGE BARS
+   MEMORIES PAGE BARS
    Every bar sways on its own slow wave. Hovering a bar straightens it and
    darkens it; when the cursor leaves it eases back slowly, leaving a trail.
 ========================= */
@@ -1343,9 +1354,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
   const items = bars.map((el, i) => ({ el, i, h: 0 }));
 
-  const SHRINK = 0;                        // the reference does not shrink the bar; raise (e.g. 0.08) if you want that
+  const SHRINK = 0;                        // bars do not shrink on hover; raise this (e.g. 0.08) if you want them to
   const SPEED = 1.1;                       // bars per second, sliding leftwards
-  const IN = 14, OUT = 6;                  // easing rates: snaps up in ~0.2s, lets go in ~0.5s (like the reference)
+  const IN = 14, OUT = 6;                  // easing rates: snaps up in ~0.2s, lets go in ~0.5s
   const lerpC = (a, b, t) => Math.round(a + (b - a) * t);
 
   // fixed leans: some bars straight, some slanted either way (they travel with the bar)
@@ -1411,7 +1422,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 
 /* =========================
-   ORANGE SHEET BLOCKS + CREAM CARD CLICK
+   ENTRIES PAGE BLOCKS (the orange sheet)
 ========================= */
 
 (() => {
@@ -1435,7 +1446,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 
 
 /* =========================
-   CREAM CARD: no hover movement. "Contact us" flips the card over to its back,
+   CONTACT CARD (the cream card): no hover movement. "Contact us" flips the card over to its back,
    which shows the contact info. Close / click outside / Esc flips it back.
 ========================= */
 

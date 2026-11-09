@@ -1,5 +1,6 @@
 /* =========================
-   STRIP ICONS: hover + click
+   NATURE STRIP ICONS: hover + click  (Dreams' Work Journal)
+   These are the scrolling icons under "Nature I Write About Most" (cloud, moon, mountains...).
    Own file on purpose: it runs even if something in script.js stops early.
    Never touches the scrolling track, so the strip keeps moving.
 ========================= */

@@ -1,7 +1,8 @@
 /* =========================
-   OWNER LOGIN (open the site with ?owner at the end of the address)
-   A sheet of the same beige paper as the entries. While it is open the intro animation
-   is on hold: it only starts after you log in (or choose to continue as a visitor).
+   OWNER LOGIN  (Dreams' Work Journal)
+   Open the site with ?owner at the end of the address to log in as the owner.
+   The login is a sheet of the same beige paper as the journal entries. While it is open the
+   intro animation is on hold: it only starts after you log in (or choose "Continue as visitor").
    Loads before script.js and journal.js on purpose.
 ========================= */
 

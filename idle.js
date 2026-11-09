@@ -1,8 +1,8 @@
 /* =========================
-   IDLE SCREENSAVER (DVD logo)
-   After a few minutes without any activity, the screen goes dark and the three-bar logo
+   IDLE SCREENSAVER  (Dreams' Work Journal)
+   After a couple of minutes without any activity, the screen goes dark and the three-bar logo
    bounces around the window like the old DVD player screensaver. Move the mouse (or touch,
-   click, press a key, scroll) and the site comes back exactly where you left it.
+   click, press a key, scroll) and the journal comes back exactly where you left it.
 
    Own file on purpose: it only adds its own overlay, it never touches the real logo,
    the intro animation or the scrolling.

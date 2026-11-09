@@ -1,16 +1,15 @@
 /* =========================
-   ENTRIES PAGE: THE CREDIT STRIP
-   Resting: one strip near the middle of the orange sheet is dark and gives a small shake every few
-   seconds; the blocks around it sit a little scattered (slightly tilted and shifted).
-   Click it: it gives a small wind-up, then the surrounding blocks straighten and line up in one
-   column, the dark strip slides into that column, and the credits write in beside them
-   (label + name, with thin lines), like the Obys credits page.
+   ENTRIES PAGE: THE CREDIT STRIP  (Dreams' Work Journal)
+   On the Entries page (the orange sheet) one strip is dark. It gives a small shake every few
+   seconds, and the blocks around it sit a little scattered (slightly tilted and shifted).
+   Click the dark strip: it winds up, the blocks around it straighten into one column, the strip
+   slides into that column, and the credits write in beside it (label + name, with thin lines).
    Click it again, click anywhere else, or press Esc to close.
 
    Own file on purpose: it needs nothing from script.js or journal.js, and if it ever
    fails the Entries page simply stays as it was.
 
-   >>> EDIT YOUR CREDITS HERE <<<
+   >>> EDIT THE CREDITS IN THE "CREDITS" LIST BELOW <<<
 ========================= */
 
 (() => {
@@ -39,17 +38,19 @@
     st.id = "credit-css";
     const MOVE = "cubic-bezier(.6,0,.2,1)";                  // slow start, quick middle, soft landing
     st.textContent = `
+      /* These rules also apply inside the small copies of this page (the Menu overview and the left-hand
+         thumbnails), so the dark strip and its shake show there too. Opening the credits only works on the real page. */
       /* blocks that slide sideways are cut off at the edges of the strip area (they slide "into" the sheet edge) */
-      #stage > .card-orange .o-blocks { clip-path: inset(-200px calc(var(--u) * -.4)); }
+      :is(#stage, .mini-inner) > .card-orange .o-blocks { clip-path: inset(-200px calc(var(--u) * -.4)); }
 
       /* the strip: dark all the time, no text on it; it slides into the left column when opened */
-      #stage .o-blocks i[data-credit] {
+      :is(#stage, .mini-inner) .o-blocks i[data-credit] {
         margin: 0; cursor: pointer;
         background-color: rgb(125, 38, 3);
         transition: background-color .5s ease, translate .75s ${MOVE};
       }
       /* little animation: a short shake every few seconds, then stillness */
-      #stage > .card-orange:not(.credit-open) .o-blocks i[data-credit]:not([data-credit-busy]) { animation: creditIdle 3.6s ease-in-out infinite; }
+      :is(#stage, .mini-inner) > .card-orange:not(.credit-open) .o-blocks i[data-credit]:not([data-credit-busy]) { animation: creditIdle 3.6s ease-in-out infinite; }
       @keyframes creditIdle {
         0%, 18%, 100% { transform: translateX(0) rotate(0); }
         3%  { transform: translateX(calc(var(--u) * -.16)) rotate(-.5deg); }
@@ -64,7 +65,7 @@
       }
 
       /* the blocks around it: a little scattered at rest ... */
-      #stage .o-blocks i[data-credit-zone] {
+      :is(#stage, .mini-inner) .o-blocks i[data-credit-zone] {
         rotate: calc(var(--jr, 0) * 1deg);
         translate: calc(var(--u) * var(--jx, 0)) calc(var(--u) * var(--jy, 0));
         transition:
@@ -91,13 +92,13 @@
       #stage > .card-orange.credit-open .o-blocks i[data-credit-zone="right"] { translate: var(--slide, 0px) 0; opacity: 0; }
 
       /* the credits themselves */
-      #stage .credit-panel {
+      :is(#stage, .mini-inner) .credit-panel {
         position: absolute; z-index: 2; display: none;
         color: rgb(140, 44, 16); font-weight: 700; letter-spacing: -.02em;
       }
-      #stage .credit-panel, #stage .credit-panel * { pointer-events: none !important; }
-      #stage .credit-panel.on { display: block; }
-      #stage .credit-panel p {
+      :is(#stage, .mini-inner) .credit-panel, :is(#stage, .mini-inner) .credit-panel * { pointer-events: none !important; }
+      :is(#stage, .mini-inner) .credit-panel.on { display: block; }
+      :is(#stage, .mini-inner) .credit-panel p {
         margin: 0 0 var(--gap, 8px); height: var(--h, 30px); box-sizing: border-box;
         display: grid; grid-template-columns: 1fr 1fr; align-items: center;
         padding-left: calc(var(--u) * .2);
@@ -106,7 +107,7 @@
         opacity: 0; transform: translateY(60%);
         transition: opacity .2s ease, transform .3s ease;
       }
-      #stage .credit-panel p b, #stage .credit-panel p span { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      :is(#stage, .mini-inner) .credit-panel p b, :is(#stage, .mini-inner) .credit-panel p span { font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       #stage > .card-orange.credit-open .credit-panel p {
         opacity: 1; transform: none;
         transition: opacity .5s ease, transform .7s ${MOVE};
@@ -139,12 +140,8 @@
 
   // the middle-column strip that rests nearest POSITION of the way down the screen (measured without any
   // scroll / slide offset, so it doesn't jump around), with free blocks around it and room for every credit row
-  function pick() {
-    const kids = host.children;
-    const sr = stageEl.getBoundingClientRect();
-    const top = Math.max(0, sr.top), bottom = Math.min(window.innerHeight, sr.bottom);
+  function choose(kids, base, top, bottom) {
     const target = top + (bottom - top) * POSITION;
-    const base = sr.top + orange.offsetTop + host.offsetTop;      // resting top of the strip grid on screen
     let best = null, bd = Infinity;
     for (let i = MIDDLE; i < kids.length; i += COLS) {
       const el = kids[i];
@@ -165,6 +162,13 @@
     return best;
   }
 
+  function pick() {
+    const sr = stageEl.getBoundingClientRect();
+    const top = Math.max(0, sr.top), bottom = Math.min(window.innerHeight, sr.bottom);
+    const base = sr.top + orange.offsetTop + host.offsetTop;      // resting top of the strip grid on screen
+    return choose(host.children, base, top, bottom);
+  }
+
   function clearMarks() {
     zone.forEach(z => {
       z.removeAttribute("data-credit-zone");
@@ -180,17 +184,13 @@
   // a stable pseudo-random number for a block, so the scatter doesn't change on every refresh
   const rnd = (n, s) => { const x = Math.sin(n * 12.9898 + s * 78.233) * 43758.5453; return x - Math.floor(x); };
 
-  function markZone() {
-    zone.forEach(z => {
-      z.removeAttribute("data-credit-zone");
-      ["--jr", "--jx", "--jy", "--d"].forEach(v => z.style.removeProperty(v));
-    });
-    zone = [];
-    const kids = host.children, rowStart = idx(cur) - MIDDLE;
+  const ZVARS = ["--jr", "--jx", "--jy", "--d"];
+  function mark(kids, strip) {
+    const out = [], rowStart = Array.prototype.indexOf.call(kids, strip) - MIDDLE;
     for (let k = -1; k <= N; k++) {
       for (let c = 0; c < COLS; c++) {
         const j = rowStart + COLS * k + c, el = kids[j];
-        if (!el || el === cur || !plain(el)) continue;
+        if (!el || el === strip || !plain(el)) continue;
         // keep: middle column (slides left, becomes the left column)   left: leaves through the left edge
         // right: leaves through the right edge   near: the rows just above / below (only straighten)
         const role = (k < 0 || k === N) ? "near" : c < MIDDLE ? "left" : c > MIDDLE ? "right" : "keep";
@@ -201,10 +201,39 @@
           el.style.setProperty("--jx", ((rnd(j, 2) - .5) * .7 * SCATTER).toFixed(2));
           el.style.setProperty("--jy", ((rnd(j, 3) - .5) * .25 * SCATTER).toFixed(2));
         }
-        zone.push(el);
+        out.push(el);
       }
     }
+    return out;
   }
+
+  function markZone() {
+    zone.forEach(z => {
+      z.removeAttribute("data-credit-zone");
+      ZVARS.forEach(v => z.style.removeProperty(v));
+    });
+    zone = mark(host.children, cur);
+  }
+
+  /* The Menu overview calls this on its small copy of the orange sheet. It picks the same strip, with the same scatter and
+     shake as the real page. The copy cannot be clicked and has no credits panel: it only needs the resting look. */
+  function decorate(clone) {
+    const h = clone && clone.querySelector(".o-blocks");
+    if (!h) return;
+    clone.classList.remove("credit-open");
+    const pn = clone.querySelector(".credit-panel"); if (pn) pn.remove();
+    h.querySelectorAll("[data-credit],[data-credit-zone]").forEach(el => {
+      ["data-credit", "data-credit-zone", "data-credit-busy", "role", "tabindex", "aria-label", "aria-expanded"].forEach(a => el.removeAttribute(a));
+      ZVARS.concat("--cx").forEach(v => el.style.removeProperty(v));
+    });
+    const H = stageEl.clientHeight;
+    if (!H) return;
+    const el = choose(h.children, H * 0.165 + h.offsetTop, 0, H);   // 16.5% = where the sheet sits on the Entries page
+    if (!el) return;
+    el.dataset.credit = TITLE;
+    mark(h.children, el);
+  }
+  window.creditStrip = { decorate };
 
   function place() {
     if (!cur) return;

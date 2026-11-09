@@ -1,16 +1,16 @@
 /* =========================
-   JOURNAL
-   - Entries are written on the ENTRIES page (the orange sheet): its first strip is
-     "+ New entry", every entry is a strip you click to edit or delete (photos, clips and a
-     free-text label like Journal, Memory, Passion, Practice, anything).
-   - The cream card is contact only. The Memories board is read-only.
-   - Front page ("Latest Entries") shows the 8 newest; your sample entries only
-     fill the empty slots and disappear as real ones arrive.
-   - Memories page lists every entry, 10 per page. A new page is created
-     automatically when the last one is full.
-   - Click an entry on the board to read it (view only).
-   Entries live in Supabase (public read, only the owner account can write):
-   text in the `entries` table, photos/videos in the public `media` bucket.
+   JOURNAL ENTRIES  (Dreams' Work Journal)
+   - You write entries on the ENTRIES page (the orange sheet). Its first strip is "+ New entry";
+     every entry is a strip you click to edit or delete. An entry has text, photos, clips and a
+     free-text label (Journal, Memory, Passion, Practice... anything you like).
+   - The cream card is for contact only. The Memories page is read-only.
+   - The front page ("Latest Entries") shows the 8 newest entries. The sample rows from index.html
+     only fill empty slots and disappear as real entries arrive.
+   - The Memories page lists every entry, 10 per page. A new page is added automatically when
+     the last one is full.
+   - Click an entry on the Memories page to read it (view only).
+   Entries live in Supabase (anyone can read, only the owner account can write):
+   text in the `entries` table, photos and videos in the public `media` bucket.
 ========================= */
 
 (() => {
@@ -50,7 +50,7 @@
 
   /* ---------- storage ---------- */
 
-  // serial number like the reference's ISBN: DRM-11: + 10 random digits, one per entry
+  // every entry gets a serial number: "DRM-11: " followed by 10 random digits
   const newSerial = () => {
     let s;
     do { s = String(1 + Math.floor(Math.random() * 9)); for (let i = 0; i < 9; i++) s += Math.floor(Math.random() * 10); }
@@ -74,7 +74,7 @@
     if (!Array.isArray(e.media)) e.media = [];
     return e;
   };
-  const isBlank = e => !((e.title || "").trim() || (e.text || "").trim() || e.media.length);
+  const isBlank = e => !((e.title || "").trim() || (e.text || "").trim() || (e.quote || "").trim() || e.media.length);
 
   const persist = en => {                  // save ONE entry (owner only)
     if (!owner || !sb || !en) return;
@@ -348,7 +348,7 @@
       '</section>' +
       '<section class="je-body">' +
         '<div class="je-c1"><input class="je-date" type="date" aria-label="Date"><input class="je-author" type="text" maxlength="40" placeholder="Author (who wrote it)" aria-label="Author"><span class="je-meta"></span></div>' +
-        '<div class="je-c2"><input class="je-tagline" type="text" maxlength="60" placeholder="A line to remember it by" aria-label="Short line"><textarea class="je-text" placeholder="Write about this day…" aria-label="Description"></textarea></div>' +
+        '<div class="je-c2"><textarea class="je-tagline" rows="1" maxlength="60" placeholder="A line to remember it by" aria-label="Short line"></textarea><textarea class="je-text" placeholder="Write about this day…" aria-label="Description"></textarea></div>' +
         '<div class="je-c3"><span class="je-count"></span></div>' +
       '</section>' +
       '<section class="je-media">' +
@@ -357,6 +357,7 @@
           '<label class="je-btn">+ Add clips<input class="je-clips" type="file" accept="video/*" multiple hidden></label>' +
           '<span class="je-note"></span>' +
         '</div>' +
+        '<div class="je-solo"></div>' +
         '<div class="je-grid"></div>' +
       '</section>' +
       '<footer class="je-foot">' +
@@ -374,14 +375,14 @@
   document.querySelector("#stage").append(dim);
   const loaderEl = q(".je-loader"), pix = q(".pixel-loader");
   const sheet = q(".je-sheet"), titleIn = q(".je-title"), dateIn = q(".je-date"), authorIn = q(".je-author"), textIn = q(".je-text");
-  const stateEl = q(".je-state"), grid = q(".je-grid"), delBtn = q(".je-del"), note = q(".je-note");
+  const stateEl = q(".je-state"), grid = q(".je-grid"), soloEl = q(".je-solo"), delBtn = q(".je-del"), note = q(".je-note");
   const labEl = q(".je-lab"), taglineIn = q(".je-tagline"), metaEl = q(".je-meta"), tagBtn = q(".je-tag"), countEl = q(".je-count"), saveBtn = q(".je-save");
 
   let cur = null, urls = [], saveT = null, delT = null, isOpen = false, mode = "edit";
   const sizeTag = () => { tagBtn.style.width = Math.max(6, (tagBtn.value || tagBtn.placeholder).length + 2) + "ch"; };
   const setLabel = v => { tagBtn.value = v; sizeTag(); };
   const fit = (el, min) => { el.style.height = "auto"; el.style.height = Math.max(el.scrollHeight, min) + "px"; };
-  const grow = () => { fit(textIn, mode === "view" ? 0 : 170); fit(titleIn, 0); if (window.__jeLock && typeof measure === "function") measure(); };
+  const grow = () => { fit(textIn, mode === "view" ? 0 : 170); fit(titleIn, 0); fit(taglineIn, 0); if (window.__jeLock && typeof measure === "function") measure(); };
   const showCount = () => { countEl.textContent = cur ? "DRM-11: " + cur.serial : ""; };
   const showMeta = () => {
     metaEl.textContent = cur ? bracketOf(cur) : "";
@@ -452,9 +453,9 @@
   }
 
   // the little clipped note on a photo: write a quote (edit mode); read-only, and hidden when empty, in view mode
-  function quoteNote(m) {
+  function quoteNote(m, solo) {
     const card = document.createElement("div");
-    card.className = "je-qnote";
+    card.className = "je-qnote" + (solo ? " solo" : "");
     const clip = document.createElement("span"); clip.className = "je-qclip"; clip.setAttribute("aria-hidden", "true");
     const mark = document.createElement("span"); mark.className = "je-qmark"; mark.setAttribute("aria-hidden", "true"); mark.innerHTML = '<svg viewBox="1 1 32 21" height="26" aria-hidden="true" focusable="false" style="display:block;height:26px;width:auto;fill:currentColor"><path d="M1.2 15.2C1.2 7.6 5.6 2.2 12.6 1.2L13.6 4.7C10.3 5.6 8.7 7.4 8.3 9.6 11.9 9.9 14 12.4 14 15.5 14 19 11.4 21.8 7.6 21.8 3.6 21.8 1.2 19 1.2 15.2Z"/><path d="M19.8 15.2C19.8 7.6 24.2 2.2 31.2 1.2L32.2 4.7C28.9 5.6 27.3 7.4 26.9 9.6 30.5 9.9 32.6 12.4 32.6 15.5 32.6 19 30 21.8 26.2 21.8 22.2 21.8 19.8 19 19.8 15.2Z"/></svg>';
     const ta = document.createElement("textarea");
@@ -475,6 +476,7 @@
     const list = await Promise.all(en.media.map(async m => ({ m, blob: m.type === "video" ? null : await getBlob(m.id) })));
     if (cur !== en) return;
     grid.textContent = ""; showCount();
+    soloEl.textContent = ""; soloEl.append(quoteNote(en, true));      // the entry's own quote note: always there, photo or not
     list.forEach(({ m, blob }) => {
       const fig = document.createElement("figure");
       fig.className = "je-item";
@@ -548,8 +550,8 @@
   q(".je-photos").addEventListener("change", e => { addFiles([...e.target.files], "image"); e.target.value = ""; });
   q(".je-clips").addEventListener("change", e => { addFiles([...e.target.files], "video"); e.target.value = ""; });
 
-  /* Opening an entry (same as the reference): the page dims, the 7x7 pixel loader
-     plays bottom-left, then the beige sheet rises from below with a little tilt. */
+  /* Opening an entry: the page dims, the 7x7 pixel loader plays bottom-left,
+     then the beige sheet rises from below with a little tilt. */
   const FRAMES = [
     ".......\n.#...#.\n.......\n.......\n.......\n.#...#.\n.......",
     "#.....#\n.#...#.\n..#.#..\n.......\n..#.#..\n.#...#.\n#.....#",
@@ -568,7 +570,7 @@
   const riseR = p => 1 - Math.pow(1 - p, 2.2);
   const dropY = p => Math.pow(p, 2.5);
 
-  /* ONE scroll for everything (like the reference): the beige entry is just another sheet of the stack.
+  /* ONE scroll for everything: the beige entry is just another sheet of the stack.
      It slides up with the page scroll together with the four sheets and the thumbnails, and they all
      come to rest together (script.js reads window.__jeLock / __jeSheetEl in layoutScroll + updateScroll). */
   const measure = () => { if (window.__jeLock && window.layoutScroll) layoutScroll(); };
@@ -638,7 +640,7 @@
   function close() {
     if (!isOpen) return;
     clearTimeout(saveT);
-    if (cur && mode === "edit" && !titleIn.value.trim() && !textIn.value.trim() && !taglineIn.value.trim() && !cur.media.length) {
+    if (cur && mode === "edit" && !titleIn.value.trim() && !textIn.value.trim() && !taglineIn.value.trim() && !(cur.quote || "").trim() && !cur.media.length) {
       const blank = cur; entries = entries.filter(x => x !== blank); removeEntry(blank); cur = null;   // nothing was written: don't keep an empty entry
     } else commit();
     isOpen = false;
@@ -660,9 +662,8 @@
     render();
   }
 
-  taglineIn.addEventListener("input", touch);
+  taglineIn.addEventListener("input", () => { fit(taglineIn, 0); touch(); });
   titleIn.addEventListener("input", () => { fit(titleIn, 0); touch(); });
-  titleIn.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); textIn.focus(); } });
   dateIn.addEventListener("input", () => { showMeta(); touch(); });
   authorIn.addEventListener("input", () => { showMeta(); touch(); });
   authorIn.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); taglineIn.focus(); } });

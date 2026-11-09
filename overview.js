@@ -1,8 +1,8 @@
 /* =========================
-   LIVE MENU OVERVIEW
-   Each sheet in the Menu overview is a scaled-down copy of the real page (same
-   markup, same CSS), so it shows what is on the page right now: your latest
-   entries, the people, the scrolling strip, the live halftone flower.
+   LIVE MENU OVERVIEW  (Dreams' Work Journal)
+   Each sheet in the Menu overview is a small copy of the real page (same markup, same CSS),
+   so it always shows what is on the page right now: your latest entries, the people in your
+   story, the scrolling nature strip and the live halftone flower.
    Own file on purpose: it needs nothing from script.js, and if it ever fails the
    old static sheets simply stay in place.
 ========================= */
@@ -55,6 +55,8 @@
       clone.querySelectorAll(".rip,.go").forEach(n => n.classList.remove("rip", "go"));
       clone.querySelectorAll(".feature-shake").forEach(n => n.classList.remove("feature-shake"));   // never copy a half-played animation
       if (p === "credits" && src.style.height) clone.style.height = src.style.height;
+      clone.querySelectorAll(".credit-panel").forEach(n => n.remove());   // the credits text only belongs to the real page (open state)
+      clone.classList.remove("credit-open");
       if (p === "contacts") clone.style.height = "36cqh";
 
       // .ov-mini is a stage-sized box (so the sheet's cqw / cqh / --u units come out exactly as on the
@@ -79,8 +81,10 @@
       sheet.prepend(wrap);
       sheet.classList.add("live");
       copyCanvases(src, clone);
+      // the dark credit strip + its little shake, exactly as on the real Entries page (needs the copy to be in the page to measure)
+      if (p === "credits" && window.creditStrip) window.creditStrip.decorate(clone);
     });
-    barPairs = null;                                   // re-pair the book bars with the fresh copy
+    barPairs = null;                                   // re-pair the Memories bars with the fresh copy
   }
 
   // the Memories bars sway on a script.js ticker that only moves the real ones: mirror their inline

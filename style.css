@@ -1,8 +1,15 @@
 
+/* =========================
+   DREAMS' WORK JOURNAL: MAIN STYLESHEET
+   How everything looks. Each big section starts with a banner like this one.
+   Later sections refine or override earlier ones, so if something looks wrong, search this file
+   for its class name and check the LAST match first.
+========================= */
+
 @import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800;900&display=swap');
 
-/* Obys NG: drop the licensed file at fonts/ObysNG.woff2 (or .otf).
-   Until it exists the browser silently falls through to the next family. */
+/* Main font. "Obys NG" is just the name of the typeface: put your licensed font file at
+   fonts/ObysNG.woff2 (or .otf). Until the file exists, the browser quietly uses the next font in the list. */
 @font-face {
   font-family: 'Obys NG';
   src: url('fonts/ObysNG.woff2') format('woff2'),
@@ -182,7 +189,7 @@ a {
 
 .nav-links a,
 .nav-menu {
-  font-size: clamp(14px, 0.92vw, 22px);   /* ~17.7px at 1920 like the reference */
+  font-size: clamp(14px, 0.92vw, 22px);   /* ~17.7px on a 1920px-wide screen */
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -214,7 +221,7 @@ a {
 
 /* .hero is made as tall as the whole scroll (script.js), the stage stays pinned */
 .stage {
-  --u: clamp(7px, 1cqw, 40px);   /* 1cqw uncapped, like the reference */
+  --u: clamp(7px, 1cqw, 40px);   /* base unit: 1% of the stage width (between 7px and 40px); most sizes are multiples of it */
   --pad: calc(var(--u) * 1.15);  /* measured side padding: 22px @1905 */
   position: sticky;
   top: 0;
@@ -274,7 +281,7 @@ a {
   padding-left: calc(var(--u) * .8);
   border-left: 1px solid currentColor;
 }
-/* "Agency" label sits on the side-text column (67.3% of the sheet) */
+/* a header label with class .push sits on the side-text column (67.3% of the sheet) */
 .card-head .push { position: absolute; left: 67.3%; }
 .card-head span:last-child { margin-left: auto; }
 
@@ -323,7 +330,7 @@ a {
   left: 24.4%; top: 10%;
   width: 57.2%; height: auto;          /* a long sheet now: the page scrolls through it */
   color: #f1f1ef;
-  overflow: visible;                 /* quote card clip + printhouse band hang over the edges */
+  overflow: visible;                 /* the quote-card clip and the nature band hang over the edges */
   background-size: 100% auto; background-repeat: repeat-y; background-position: top center;
 }
 .g-hero { position: relative; height: 100cqh; }
@@ -341,7 +348,7 @@ a {
   font-weight: 500;
 }
 .card-grid {
-  /* your logo: three bars (top centred, middle left, bottom right), 290:111 like the artwork */
+  /* the journal logo: three bars (top centred, middle left, bottom right), 290:111 like the artwork */
   --logo: #d9d9d9;
   aspect-ratio: 290 / 111;
   position: absolute;
@@ -449,7 +456,7 @@ body.drawing .emblem { color: #e0562c; }
 }
 .sec-title small { font-size: inherit; font-weight: inherit; }
 
-/* Featured Books + orange quotes card */
+/* "Latest Entries" list + the orange "Notes to self" card */
 .feat {
   position: relative;
   display: grid;
@@ -519,7 +526,7 @@ body.drawing .emblem { color: #e0562c; }
 }
 .book-list i { font-style: normal; font-size: calc(var(--u) * 1.5); font-weight: 700; }
 
-/* Featured Authors */
+/* "People in My Story" */
 .author-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -541,7 +548,7 @@ body.drawing .emblem { color: #e0562c; }
 .author b { display: block; font-size: calc(var(--u) * 1.5); line-height: 1; font-weight: 700; letter-spacing: -.04em; }
 .author small { display: block; margin-top: calc(var(--u) * .35); font-size: calc(var(--u) * .75); font-weight: 600; }
 
-/* Top most liked: orange band hangs over both edges of the sheet */
+/* "Nature I Write About Most": the orange scrolling band hangs over both edges of the sheet */
 .houses { padding-top: calc(var(--u) * 3.4); }
 .houses-label {
   padding: 0 calc(var(--u) * .9);
@@ -564,7 +571,7 @@ body.drawing .emblem { color: #e0562c; }
 }
 .band span:first-child { border-left: 0; }
 
-/* About project */
+/* "About This Journal" */
 .about { padding-top: calc(var(--u) * 7); }
 .about-lead {
   padding: 0 calc(var(--u) * .9);
@@ -645,19 +652,19 @@ body.drawing .emblem { color: #e0562c; }
 
 
 /* =========================
-   FLOWER, PRINTHOUSE LOGO
+   HALFTONE FLOWER
 ========================= */
 
 /* halftone flower: plant box measured at 400px wide, 252px below the sheet top @1905 */
 .flower {
   position: absolute;
-  /* sized + placed like the reference: ~38% of the logo width, starts ~17u above the logo's first bar */
+  /* size and position: ~38% of the logo width, starting ~17u above the logo's first bar */
   left: 25.9%; top: calc(51.9cqh - var(--u) * 14);
   width: 47.5%;
   pointer-events: none;
   user-select: none;
   image-rendering: pixelated;      /* keep the halftone dots hard-edged, no smoothing */
-  mix-blend-mode: multiply;        /* dots darken the paper and the light bars like the reference */
+  mix-blend-mode: multiply;        /* dots darken the paper and the light bars underneath */
 }
 .numerals .n img { image-rendering: pixelated; }
 canvas.flower { image-rendering: auto; height: auto; }
@@ -665,12 +672,12 @@ canvas.flower { image-rendering: auto; height: auto; }
 
 
 /* =========================
-   HOVER BOOK IMAGE
+   HOVER PICTURE (follows the cursor over the entry lists)
 ========================= */
 
 .hover-pic {
   position: absolute; left: 0; top: 0;
-  width: calc(var(--u) * 17);     /* same size as the reference */
+  width: calc(var(--u) * 17);     /* picture size */
   pointer-events: none;
   z-index: 35;
   opacity: 0;
@@ -688,7 +695,7 @@ canvas.flower { image-rendering: auto; height: auto; }
 .pixels {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
-  z-index: 0;                 /* behind the sheets, like the reference */
+  z-index: 0;                 /* behind the sheets */
   pointer-events: none;
 }
 body.drawing .pixels { z-index: 40; pointer-events: auto; cursor: crosshair; }
@@ -837,15 +844,15 @@ body.ready .card-cream {
 .card-grey   { z-index: 3; }
 .card-cream  { z-index: 4; }
 
-/* Books: the white sheet comes forward, wide, over the grey one */
+/* Memories page (called "books" in the code): the white sheet comes forward, wide, over the grey one */
 .stage[data-page="books"] .card-white { z-index: 3; left: 18%; top: 40.8%; width: 56%; }
 .stage[data-page="books"] .card-grey  { z-index: 2; }
 
-/* Credits: the orange perforated sheet comes in front of the grey one */
+/* Entries page (called "credits" in the code): the orange perforated sheet comes in front of the grey one */
 .stage[data-page="credits"] .card-orange { z-index: 5; top: 16.5%; }
 .stage[data-page="credits"] .card-grey   { z-index: 2; }
 
-/* Contacts: the cream card grows and shows the contact lines */
+/* Contact page (called "contacts" in the code): the cream card grows and shows the contact lines */
 .stage[data-page="contacts"] .card-cream { left: 67.6%; top: 70%; width: 24.6%; height: 36%; }
 .cc-info {
   display: none;
@@ -873,7 +880,9 @@ body.ready .card-cream {
 
 
 /* =========================
-   COLLECTION ENTRY + FULL CATALOGUE
+   LEFTOVER FROM AN EARLIER VERSION: book catalogue pop-up
+   The journal pages no longer use the catalogue / book-cover styles in this block, so they can be
+   cleaned out later. The .card-white padding rules near the end of the block ARE still used.
 ========================= */
 
 .collection-cta {
@@ -1195,7 +1204,7 @@ body.ready .card-cream {
 
 
 /* =========================
-   WHITE PAGE: "Books We Recommend"
+   MEMORIES PAGE: the white sheet
 ========================= */
 
 .card-white .card-head .push { left: 36%; }
@@ -1312,7 +1321,7 @@ body.overview-open .nav-menu { visibility: hidden; }
 
 
 /* =========================
-   THUMBNAIL SIDEBAR: match the reference
+   THUMBNAIL SIDEBAR
    no outline / NOW badge / label; inactive sheets dimmed, active one full
    brightness; the "≡" under each sheet is three tight lines and is clickable
 ========================= */
@@ -1376,12 +1385,12 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
    PAGE CHANGE: keep the compositor free while the sheets travel
 ========================= */
 
-.stage.paging { pointer-events: none; }      /* no hover work (book pictures, thumbs) mid-flight */
+.stage.paging { pointer-events: none; }      /* no hover work (hover pictures, thumbnails) mid-flight */
 .stage.paging .card { transition: none !important; box-shadow: none !important; }  /* big blurred shadows re-paint every frame while sheets rotate */
 
 
 /* =========================
-   BOOKS PAGE: big title, tilted grey bars, tall list rows (matches the reference)
+   MEMORIES PAGE: big title, tilted grey bars, tall list rows
 ========================= */
 
 .card-white .card-head .push { left: 34.8%; }
@@ -1522,7 +1531,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 
 /* =========================
-   MOODS BAND: darker orange strip with inset divider lines, scrolling sideways forever
+   NATURE BAND: darker orange strip with inset divider lines, scrolling sideways forever
 ========================= */
 .band {
   display: block;
@@ -1563,7 +1572,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 }
 
 /* =========================
-   MOODS BAND: match the printhouse reference
+   NATURE BAND (refined look)
    flat kraft-orange strip, small corner radius, darker lip peeking out above it,
    thin divider lines inset from top and bottom
 ========================= */
@@ -1580,13 +1589,13 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 }
 .band span::before { top: 15%; bottom: 13.5%; background: rgba(30,18,14,.8); }
 
-/* emotion logos inside the band */
+/* nature icons inside the band */
 .band span svg { display: block; width: calc(var(--u) * 3.8); height: auto; overflow: visible; }
 @media (max-width: 768px) { .band span svg { width: calc(var(--u) * 9); } }
 
 
 /* =========================
-   MOODS BAND: looped strap look + stays in front of the small card
+   NATURE BAND: looped strap look + stays in front of the small card
 ========================= */
 /* the grey sheet (and the strip hanging off its edge) now sits in front of the small cream card */
 .card-grey { z-index: 5; }
@@ -1609,7 +1618,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 .band::after  { right: 0; border-top-left-radius: calc(var(--u) * .62); transform: scaleX(-1); }
 
 /* =========================
-   MOODS BAND FIX: hard-clip the scrolling icons to the strip, shorter folded ends
+   NATURE BAND FIX: hard-clip the scrolling icons to the strip, shorter folded ends
 ========================= */
 .band-clip {
   overflow: hidden;
@@ -1618,7 +1627,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 }
 .band-track { will-change: auto; }
 
-/* the fold only shows over the part of the strip that hangs off the sheet (2u), like the reference */
+/* the fold only shows over the part of the strip that hangs off the sheet (2u) */
 .band::before, .band::after {
   width: calc(var(--u) * 2);
   height: calc(var(--u) * .8);
@@ -1629,7 +1638,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 .band::before, .band::after { border-top-left-radius: calc(var(--u) * .7); }
 
 /* =========================
-   MOODS BAND: much rounder, like a strap folded round the sheet (reference)
+   NATURE BAND: much rounder, like a strap folded round the sheet
    big corner radius on the strip; the dark underside shows in the curve above the corner
 ========================= */
 .band {
@@ -1658,7 +1667,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 
 /* =========================================================
-   PRINTHOUSE STRIP: exact match of the reference
+   NATURE STRIP (final look)
    kraft-orange band wider than the sheet by 2u each side, fold tabs behind the
    top corners, fine corrugation, 6 charcoal logos separated by inset rules,
    marquee scrolling sideways (3 copies of the 6 logos so it never shows a gap)
@@ -1707,7 +1716,7 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
   pointer-events: none;
 }
 
-/* first divider sits 3u in from the band's left edge, like the reference;
+/* first divider sits 3u in from the band's left edge;
    one set of 6 = one third of the track */
 @keyframes printStrip {
   from { transform: translateX(calc(var(--u) * 3 - 33.3333%)); }
@@ -1860,12 +1869,12 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 
 
 /* =========================
-   JOURNAL: real entries, pager, entry editor  (journal.js)
+   JOURNAL ENTRIES: real entries, pager, entry editor  (journal.js)
 ========================= */
 
 /* entries you wrote are clickable */
 .book-list li.real, .card-list li.real { cursor: pointer; }
-/* hover = the row dims (like the reference), no underline */
+/* hover = the row dims, no underline */
 .book-list li, .card-list li { transition: background-color .25s ease; }
 .book-list li:hover, .card-list li:hover { background-color: rgba(17, 17, 17, .11); }
 .book-list li.real:focus-visible, .card-list li.real:focus-visible { outline: 2px solid #e0562c; outline-offset: -2px; }
@@ -2004,12 +2013,12 @@ body.dragging-thumb, body.dragging-thumb * { cursor: grabbing !important; user-s
 .je-sheet.view .je-media { padding-bottom: 40px; }
 
 
-/* reference look: (kind, year) on the left, big short line + text in the middle, DRM-11 serial on the right */
+/* entry layout: (kind, year) on the left, big short line + text in the middle, DRM-11 serial on the right */
 .je-meta { display: none; }
 .je-sheet.view .je-meta { display: block; }
 .je-sheet.view .je-date { display: none; }
 .je-tagline {
-  display: block; width: 100%; margin: 0 0 22px; padding: 0; background: none; border: 0; outline: 0;
+  display: block; width: 100%; min-height: 1em; margin: 0 0 22px; padding: 0; background: none; border: 0; outline: 0; resize: none; overflow: hidden;
   color: #262626; font: inherit; font-size: clamp(26px, 2.6vw, 36px); font-weight: 800; line-height: 1.02; letter-spacing: -.04em;
 }
 .je-tagline::placeholder { color: #9a988b; opacity: 1; }
@@ -2128,3 +2137,8 @@ input.je-tag:focus { outline: 2px solid #e0562c; outline-offset: 2px; }
   filter: drop-shadow(0 1px 1px rgba(0,0,0,.25));
 }
 .je-item.photo { overflow: visible; }   /* the paperclip hangs over the photo edge */
+
+/* the entry's own quote note (works with no photo at all): sits in the flow instead of over a picture */
+.je-solo { margin-top: 16px; }
+.je-solo:empty { display: none; }
+.je-qnote.solo { position: relative; right: auto; bottom: auto; width: min(100%, 340px); min-width: 0; }
