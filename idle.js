@@ -11,7 +11,7 @@
 ========================= */
 
 (() => {
-  const IDLE_MINUTES = 4;                       // change this: anything from 3 to 5 feels right
+  const IDLE_MINUTES = 5 / 60;                  // TESTING: 5 seconds. For real use change to 4 (minutes)
   const SPEED = 170;                            // pixels per second
   const COLORS = ["#f4f4f4", "#e0562c", "#cbc9bb", "#7fb7a4", "#e6c35c", "#8f9bd9"];
 
@@ -120,7 +120,7 @@
     arm();
   }
 
-  ["mousemove", "mousedown", "pointerdown", "touchstart", "keydown", "wheel", "scroll"].forEach(ev =>
+  ["mousemove", "mousedown", "pointerdown", "touchstart", "keydown", "wheel"].forEach(ev =>
     window.addEventListener(ev, activity, { passive: true, capture: true }));
 
   window.addEventListener("resize", () => { if (overlay) measure(); });
@@ -129,5 +129,6 @@
   document.addEventListener("visibilitychange", () => { if (!document.hidden) { if (overlay) stop(); arm(); } });
 
   arm();
-  if (debug) console.log("[idle] ready, screensaver after", IDLE_MS / 1000, "seconds without activity");
+  console.info("[idle] loaded: screensaver after " + IDLE_MS / 1000 + "s without activity. Test now: idleScreensaver.start()");
+  window.idleScreensaver = { start, stop, arm };
 })();
